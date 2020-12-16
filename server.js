@@ -21,7 +21,7 @@ app.get("/", function (req, res) {
 
 // require statements
 
-const getTimestamp = date => ({
+const getTimestamp = dateString => ({
   unix: date.getTime(),
   utc: date.toUTCString()
 });
@@ -33,60 +33,40 @@ const getTimestamp = date => ({
 //An empty date parameter should return the current time in a JSON object with a unix key
 //An empty date parameter should return the current time in a JSON object with a utc key
 
-app.get("/api/timestamp/", (req,res) => {
-  const {date} = req.url.splice('/api/timestamp/'));
-  var dateReq = new Date(date);
-
-
-// Request to /api/timestamp/1451001600000
-  if(isNaN(dateReq))
-  {
-    return res.json({
-    error: "Invalid Date"
-  })
-  }
-  else 
-  {
-    return res.json({
-      unix: dateReq.getTime(),
-      utc: dateReq.toUTCString()
-   })
-  }
-  
-app.get("/api/timestamp/",  (req, res) =>  {
-
-    const {date} = req.url.split("/api/timestamp/")[1];
-    let timestamp;
-
-if (dateString === undefined || dateString.trim() === "") {
-     timestamp = getTimestamp(new Date());
-    } else {
-      const date = !isNaN(dateString)
-        ? new Date(parseInt(dateString))
-        : new Date(dateString);
-
-      if (!isNaN(date.getTime())) {
-        timestamp = getTimestamp(date);
-      } else {
-        timestamp = {
-          error: "invalid date"
-        };
-}
-{
-
-    var dateReq = new Date(date);
-    return res.json({
-      unix: dateReq.getTime(),
-      utc: dateReq.toUTCString()
-    })
-})
-
-
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// Request to /api/timestamp/ - empty param
+app.get("/api/timestamp/", (req,res) => {
+    let timestamp = new Date();
+    return res.json({
+      unix: timestamp.getTime(),
+      utc: timestamp.toUTCString()
+    });
+});
+
+app.get("/api/timestamp/:dateString",  (req, res) =>  {
+    const { dateString } = req.params;
+    let timestamp = new Date(dateString);
+
+  if (timestamp.toString() === "Invalid Date") {
+    timestamp = new Date(parseInt(dateString));
+    console.log('The', timestamp);
+  };
+  if (timestamp.toString() === "Invalid Date") {
+  return res.json({
+      error: "Invalid Date"
+    })
+  }
+  else {
+      return res.json({
+      unix: timestamp.getTime(),
+      utc: timestamp.toUTCString()
+    })
+  }
+});
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
